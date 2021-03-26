@@ -39,9 +39,11 @@ import com.coresecure.brightcove.wrapper.utils.HttpServices;
 import com.coresecure.brightcove.wrapper.utils.ImageUtil;
 import com.day.cq.dam.api.Asset;
 import com.day.cq.dam.api.AssetManager;
+import com.day.cq.reporting.helpers.Const;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ResourceResolverFactory;
+import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.commons.json.JSONException;
 import org.apache.sling.commons.json.JSONObject;
 import org.apache.sling.commons.mime.MimeTypeService;
@@ -54,7 +56,6 @@ import javax.jcr.RepositoryException;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -194,7 +195,14 @@ public class VideoImportCallable implements Callable<String> {
     }
 
     private String cleanPath(String confPath, String filename){
-        return (confPath.endsWith("/") ? confPath : confPath.concat("/")).concat(requestedServiceAccount + "/").concat(filename);
+        //Read config value and do bucket folder logic if true
+        if (serviceUtil.isBucketFolderStructureConfig() && filename.length() >= 3) {
+            return confPath.concat("/").concat(requestedServiceAccount + "/").concat(filename.substring(0,1) + "/").concat(filename.substring(0,2) + "/").concat(filename.substring(0,3) + "/").concat(filename);
+        } else if (confPath.endsWith("/")) {
+            return confPath;
+        } else {
+            return confPath.concat("/").concat(requestedServiceAccount + "/").concat(filename);
+        }
     }
     private String cleanFilename(JSONObject innerObj) throws JSONException{
         return innerObj.getString(Constants.ORIGINAL_FILENAME) != null ? innerObj.getString(Constants.ORIGINAL_FILENAME).replaceAll("%20", " ") : null;
@@ -273,6 +281,11 @@ public class VideoImportCallable implements Callable<String> {
                 SimpleDateFormat sdf = new SimpleDateFormat(ISO_8601_24H_FULL_FORMAT);
                 Date remote_date = sdf.parse(innerObj.getString(Constants.UPDATED_AT));
 
+                Resource metadataResource = newAsset.adaptTo(Resource.class).getChild("jcr:content/metadata");
+                ValueMap metadataProperties = metadataResource.adaptTo(ValueMap.class);
+                String local_folder_id = metadataProperties.get(Constants.BRC_FOLDER_ID,"");
+                String remote_folder_id = innerObj.getString(Constants.FOLDER_ID);
+
                 //LOCAL COMPARISON DATE TO SEE IF IT NEEDS TO UPDATE
                 if (local_mod_date.compareTo(remote_date) < 0) {
                     LOGGER.trace("OLDERS-DATE>>>>>" + local_mod_date);
@@ -281,6 +294,10 @@ public class VideoImportCallable implements Callable<String> {
                     LOGGER.trace("MODIFICATION DETECTED");
                     serviceUtil.updateAsset(newAsset, innerObj, resourceResolver, requestedServiceAccount);
 
+                } else if (!local_folder_id.equals(remote_folder_id)) {
+                    LOGGER.trace("MODIFICATION DETECTED");
+                    LOGGER.trace("LOCAL FOLDER: {}, REMOTE FOLDER: {}",local_folder_id,remote_folder_id);
+                    serviceUtil.updateAsset(newAsset, innerObj, resourceResolver, requestedServiceAccount);
                 } else {
                     LOGGER.trace("No Changes to be Made = Asset is equivalent");
 

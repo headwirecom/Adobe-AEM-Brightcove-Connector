@@ -66,7 +66,8 @@ import java.util.*;
         @Property(name = "defPlaylistPlayerKey", label = "Default Playlist Player Key", description = "Default Playlist Player Key - DEPRECATED", value = ""),
         @Property(name = "proxy", label = "Proxy server", description = "Proxy server in the form proxy.foo.com:3128", value = {""}),
         @Property(name = "asset_integration_path", label = "Dam Integration Path", description = "Remote Asset Metadata Storage Path", value = "/content/dam/brightcove_assets"),
-        @Property(name = "ingest_profile", label = "Ingest Profile", description = "Configure default Ingest Profile", value = "")
+        @Property(name = "ingest_profile", label = "Ingest Profile", description = "Configure default Ingest Profile", value = ""),
+        @Property(name = "bucket_folder_structure", label = "Use Bucket Folder Structure", description = "Store videos in DAM within bucket folders", boolValue = false)
 })
 
 
@@ -139,6 +140,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     public String getAccountAlias() {
         return (String) getProperties().get("accountAlias");
+    }
+
+    public Boolean isBucketFolderStructure() {
+        return (Boolean) getProperties().get("bucket_folder_structure");
     }
 
     public String[] getAllowedGroups() {

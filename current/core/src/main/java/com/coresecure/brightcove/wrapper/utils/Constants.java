@@ -74,6 +74,7 @@ public class Constants {
     public static final String BRC_LONG_DESCRIPTION = "brc_long_description";
     public static final String BRC_DURATION = "brc_duration";
     public static final String BRC_STATE = "brc_state";
+    public static final String BRC_FOLDER_ID = "brc_folder_id";
 
 
     public static final String EQUIRECTANGULAR = "equirectangular";

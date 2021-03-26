@@ -298,6 +298,7 @@ public class APITest {
             String aDescription = "test1234";
             String aLong_description = "test1234";
             String aState = "test1234";
+            String aFolder_id = "12345";
             boolean aComplete = false;
             EconomicsEnum aEconomics;
             String aAccountId = "test1234";
@@ -487,7 +488,7 @@ public class APITest {
 
 
             //VIDEO CREATION FROM STATIC - //////////////////////////////////////////////////////////////////////////////////////////
-            Video testvideo = new Video(aId, aName, aReference_id, aDescription, aLong_description, aState, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, null, aProjection, aText_tracks, aImages);
+            Video testvideo = new Video(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, null, aProjection, aText_tracks, aImages);
 
             //ADDITIONAL CONSTRUCTORS - DID NOT CASCADE....
 
@@ -518,12 +519,12 @@ public class APITest {
 
             //STATIC CONSTRUCTORS
             Video video0 = new Video(aName);
-            Video video1 = new Video(aName, aReference_id, aDescription, aLong_description, aState, aTags, aGeo, aSchedule, aComplete, aLink);
-            Video video2 = new Video(aId, aName, aReference_id, aDescription, aLong_description, aState, aTags, aGeo, aSchedule, aComplete, aLink);
-            Video video3 = new Video(aId, aName, aReference_id, aDescription, aLong_description, aState, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, null);
-            Video video4 = new Video(aId, aName, aReference_id, aDescription, aLong_description, aState, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, null, aProjection);
-            Video video5 = new Video(aId, aName, aReference_id, aDescription, aLong_description, aState, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, null, aProjection, aText_tracks);
-            Video video6 = new Video(aId, aName, aReference_id, aDescription, aLong_description, aState, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, null, aProjection, aText_tracks, aImages);
+            Video video1 = new Video(aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aTags, aGeo, aSchedule, aComplete, aLink);
+            Video video2 = new Video(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aTags, aGeo, aSchedule, aComplete, aLink);
+            Video video3 = new Video(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, null);
+            Video video4 = new Video(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, null, aProjection);
+            Video video5 = new Video(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, null, aProjection, aText_tracks);
+            Video video6 = new Video(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, null, aProjection, aText_tracks, aImages);
 
             //STATIC - EMPTY
             Video.class.toString();

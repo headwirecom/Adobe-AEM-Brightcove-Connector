@@ -356,6 +356,7 @@ public class BrcApi extends SlingAllMethodsServlet {
                 request.getParameter(Constants.DESCRIPTION),
                 request.getParameter(Constants.LONG_DESCRIPTION),
                 "",
+                "",
                 tagsToAdd,
                 null,
                 null,
@@ -456,6 +457,7 @@ public class BrcApi extends SlingAllMethodsServlet {
 
             com.coresecure.brightcove.wrapper.objects.Video video = new Video(
                     request.getParameter(Constants.ID),
+                    null,
                     null,
                     null,
                     null,

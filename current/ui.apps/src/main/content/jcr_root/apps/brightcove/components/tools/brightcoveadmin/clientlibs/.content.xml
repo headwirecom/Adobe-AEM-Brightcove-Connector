@@ -4,4 +4,6 @@
     categories="[brc.brightcove-api]"
     channels="[!touch]"
     dependencies="[brc.bootstrap.v2]"
+    jsProcessor="[default:none,min:none]"
+    cssProcessor="[default:none,min:none]"
     embed="[]"/>

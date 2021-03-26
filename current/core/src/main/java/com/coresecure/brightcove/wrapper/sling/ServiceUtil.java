@@ -74,7 +74,7 @@ import java.util.concurrent.TimeUnit;
 public class ServiceUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceUtil.class);
     private static final String ISO_8601_24H_FULL_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
-    private static final String[] fields = {Constants.NAME, Constants.CREATED_AT  , Constants.DURATION, Constants.COMPLETE, Constants.ID, Constants.ACCOUNT_ID ,Constants.DESCRIPTION , Constants.LINK, Constants.TAGS, Constants.LONG_DESCRIPTION, Constants.REFERENCE_ID, Constants.ECONOMICS, Constants.UPDATED_AT , Constants.SCHEDULE, Constants.STATE, Constants.GEO , Constants.CUSTOM_FIELDS, Constants.TEXT_TRACKS , Constants.IMAGES ,Constants.PROJECTION};
+    private static final String[] fields = {Constants.NAME, Constants.CREATED_AT  , Constants.DURATION, Constants.COMPLETE, Constants.ID, Constants.ACCOUNT_ID ,Constants.DESCRIPTION , Constants.LINK, Constants.TAGS, Constants.LONG_DESCRIPTION, Constants.REFERENCE_ID, Constants.ECONOMICS, Constants.UPDATED_AT , Constants.SCHEDULE, Constants.STATE, Constants.FOLDER_ID, Constants.GEO , Constants.CUSTOM_FIELDS, Constants.TEXT_TRACKS , Constants.IMAGES ,Constants.PROJECTION};
 
     private String account_id;
     public static final int DEFAULT_LIMIT = 100;
@@ -860,10 +860,14 @@ public class ServiceUtil {
             }
             map.put(key, obj); //MAIN SET OF THE KEYS->VALUES FOR THIS VIDEO OBJECT
         } else {
-
-            //Improve this check, this is the handle for null object / string
-            //WE TAKE THESE NULL VALUES AS ACTUAL VALUES AND EXECUTE
-            removeObject(key, x, map, newAsset, assetmap );
+            //Keep the folder id value even if it is null
+            if (key.equals(Constants.BRC_FOLDER_ID)) {
+                map.put(key, "null");
+            } else {
+                //Improve this check, this is the handle for null object / string
+                //WE TAKE THESE NULL VALUES AS ACTUAL VALUES AND EXECUTE
+                removeObject(key, x, map, newAsset, assetmap );
+            }
         }
     }
 
@@ -1158,6 +1162,7 @@ public class ServiceUtil {
         String shortDescription = map.get(Constants.BRC_DESCRIPTION,"");
         String longDescription = map.get(Constants.BRC_LONG_DESCRIPTION,"");
         String projection = "equirectangular".equals(map.get(Constants.BRC_PROJECTION,""))? Constants.EQUIRECTANGULAR : "";
+        String folderId = map.get(Constants.BRC_FOLDER_ID, "");
 
 
         Map<String, Object> custom_fields = new HashMap();
@@ -1197,6 +1202,7 @@ public class ServiceUtil {
                 shortDescription,
                 longDescription,
                 aState,
+                folderId,
                 tags,
                 geo,
                 schedule,
@@ -1209,5 +1215,12 @@ public class ServiceUtil {
         LOGGER.trace("Video {}", video);
         LOGGER.trace(">>>>>>>>>>///>>>>>>>>>>");
         return video;
+    }
+
+    //Gets the value for the bucket folder structure config
+    public Boolean isBucketFolderStructureConfig() {
+        ConfigurationGrabber cg = ServiceUtil.getConfigurationGrabber();
+        ConfigurationService brcService = cg.getConfigurationService(account_id);
+        return brcService.isBucketFolderStructure();
     }
 }

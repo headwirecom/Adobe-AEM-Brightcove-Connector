@@ -70,4 +70,6 @@ public interface ConfigurationService {
 
     String getIngestProfile();
 
+    Boolean isBucketFolderStructure();
+
 }
