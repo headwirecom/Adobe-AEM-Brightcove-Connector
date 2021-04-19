@@ -40,6 +40,7 @@ import com.coresecure.brightcove.wrapper.schedulers.asset_integrator.callables.V
 import com.coresecure.brightcove.wrapper.sling.ConfigurationGrabber;
 import com.coresecure.brightcove.wrapper.sling.ConfigurationService;
 import com.coresecure.brightcove.wrapper.sling.ServiceUtil;
+import com.coresecure.brightcove.wrapper.utils.Constants;
 import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.felix.scr.annotations.*;
 import org.apache.felix.scr.annotations.Properties;
@@ -132,7 +133,16 @@ public class AssetPropertyIntegrator extends SlingAllMethodsServlet {
                     //GET VIDEOS
                     int startOffset = 0;
                     JSONObject jsonObject = new JSONObject(serviceUtil.searchVideo("", startOffset, 0)); //QUERY<------
+                    JSONObject foldersJsonObject = new JSONObject(serviceUtil.getFolders()); //FOLDERS QUERY<------
                     final JSONArray itemsArr = jsonObject.getJSONArray("items");
+                    final JSONArray foldersItemsArr = foldersJsonObject.getJSONArray("items");
+
+                    //Create a map that contains the folder id as the key and folder name as value
+                    Map<String,String> folderMap = new HashMap<String,String>();
+                    for (int i = 0; i < foldersItemsArr.length(); i++) {
+                        final JSONObject folderObj = foldersItemsArr.getJSONObject(i);
+                        folderMap.put(folderObj.getString(Constants.ID),folderObj.getString(Constants.NAME));
+                    }
 
 
                     LOGGER.trace("<<< " + itemsArr.length() + " INCOMING VIDEOS");
@@ -140,6 +150,11 @@ public class AssetPropertyIntegrator extends SlingAllMethodsServlet {
                     //FOR EACH VIDEO IN THE ITEMS ARRAY
                     for (int i = 0; i < itemsArr.length(); i++) {
                         final JSONObject innerObj = itemsArr.getJSONObject(i);
+
+                        //Get the folder name to add as an additional property
+                        String folderId = innerObj.getString(Constants.FOLDER_ID);
+                        String folderName = folderMap.get(folderId) != null ? folderMap.get(folderId) : "null";
+                        innerObj.put(Constants.FOLDER_NAME,folderName);
 
                         Callable<String> callable = new VideoImportCallable(innerObj, confPath, requestedServiceAccount, resourceResolverFactory, mType, serviceUtil);
                         Future<String> future = executor.submit(callable);

@@ -75,6 +75,7 @@ public class Constants {
     public static final String BRC_DURATION = "brc_duration";
     public static final String BRC_STATE = "brc_state";
     public static final String BRC_FOLDER_ID = "brc_folder_id";
+    public static final String BRC_FOLDER_NAME = "brc_folder_name";
 
 
     public static final String EQUIRECTANGULAR = "equirectangular";
@@ -87,6 +88,7 @@ public class Constants {
 
     public static final String DIGITAL_MASTER_ID = "digital_master_id";
     public static final String FOLDER_ID = "folder_id";
+    public static final String FOLDER_NAME = "folder_name";
 
     public static final String WIDTH = "width";
     public static final String HEIGHT = "height";

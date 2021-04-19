@@ -57,6 +57,7 @@ public class Video {
     public final String long_description;
     public final String state;
     public final String folder_id;
+    public final String folder_name;
     public final Collection<String> tags;
     public final Map<String, Object> custom_fields;
     public final Geo geo;
@@ -70,34 +71,34 @@ public class Video {
 
 
     public Video(String aName) {
-        this( aName, null, null, null, null, null, null, null, null, false, null);
+        this( aName, null, null, null, null, null, null, null, null, null, false, null);
     }
 
-    public Video(String aName, String aReference_id, String aDescription, String aLong_description, String aState, String aFolder_id, Collection<String> aTags, Geo aGeo, Schedule aSchedule, boolean aComplete, RelatedLink aLink) {
-        this(null, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aTags, aGeo, aSchedule, aComplete, aLink);
+    public Video(String aName, String aReference_id, String aDescription, String aLong_description, String aState, String aFolder_id, String aFolder_name, Collection<String> aTags, Geo aGeo, Schedule aSchedule, boolean aComplete, RelatedLink aLink) {
+        this(null, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aFolder_name, aTags, aGeo, aSchedule, aComplete, aLink);
     }
 
-    public Video(String aId, String aName, String aReference_id, String aDescription, String aLong_description, String aState, String aFolder_id, Collection<String> aTags, Geo aGeo, Schedule aSchedule, boolean aComplete, RelatedLink aLink) {
-        this(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aTags, aGeo, aSchedule, aComplete, aLink, null, null);
+    public Video(String aId, String aName, String aReference_id, String aDescription, String aLong_description, String aState, String aFolder_id, String aFolder_name, Collection<String> aTags, Geo aGeo, Schedule aSchedule, boolean aComplete, RelatedLink aLink) {
+        this(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aFolder_name, aTags, aGeo, aSchedule, aComplete, aLink, null, null);
     }
 
-    public Video(String aId, String aName, String aReference_id, String aDescription, String aLong_description, String aState, String aFolder_id, Collection<String> aTags, Geo aGeo, Schedule aSchedule, boolean aComplete, RelatedLink aLink, Map<String, Object> aCustom_fields, EconomicsEnum aEconomics) {
-        this(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, aEconomics, null);
+    public Video(String aId, String aName, String aReference_id, String aDescription, String aLong_description, String aState, String aFolder_id, String aFolder_name, Collection<String> aTags, Geo aGeo, Schedule aSchedule, boolean aComplete, RelatedLink aLink, Map<String, Object> aCustom_fields, EconomicsEnum aEconomics) {
+        this(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aFolder_name, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, aEconomics, null);
     }
 
-    public Video(String aId, String aName, String aReference_id, String aDescription, String aLong_description, String aState, String aFolder_id, Collection<String> aTags, Geo aGeo, Schedule aSchedule, boolean aComplete, RelatedLink aLink, Map<String, Object> aCustom_fields, EconomicsEnum aEconomics, String aProjection) {
-        this(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, aEconomics, aProjection, null);
+    public Video(String aId, String aName, String aReference_id, String aDescription, String aLong_description, String aState, String aFolder_id, String aFolder_name, Collection<String> aTags, Geo aGeo, Schedule aSchedule, boolean aComplete, RelatedLink aLink, Map<String, Object> aCustom_fields, EconomicsEnum aEconomics, String aProjection) {
+        this(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aFolder_name, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, aEconomics, aProjection, null);
     }
 
-    public Video(String aId, String aName, String aReference_id, String aDescription, String aLong_description, String aState, String aFolder_id, Collection<String> aTags, Geo aGeo, Schedule aSchedule, boolean aComplete, RelatedLink aLink, Map<String, Object> aCustom_fields, EconomicsEnum aEconomics, String aProjection, JSONArray aText_tracks) {
-        this(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, aEconomics, aProjection, aText_tracks, null);
+    public Video(String aId, String aName, String aReference_id, String aDescription, String aLong_description, String aState, String aFolder_id, String aFolder_name, Collection<String> aTags, Geo aGeo, Schedule aSchedule, boolean aComplete, RelatedLink aLink, Map<String, Object> aCustom_fields, EconomicsEnum aEconomics, String aProjection, JSONArray aText_tracks) {
+        this(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aFolder_name, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, aEconomics, aProjection, aText_tracks, null);
     }
 
-    public Video(String aId, String aName, String aReference_id, String aDescription, String aLong_description, String aState, String aFolder_id, Collection<String> aTags, Geo aGeo, Schedule aSchedule, boolean aComplete, RelatedLink aLink, Map<String, Object> aCustom_fields, EconomicsEnum aEconomics, String aProjection, JSONArray aText_tracks, Images aImages) {
-        this(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, aEconomics, aProjection, aText_tracks, null, null);
+    public Video(String aId, String aName, String aReference_id, String aDescription, String aLong_description, String aState, String aFolder_id, String aFolder_name, Collection<String> aTags, Geo aGeo, Schedule aSchedule, boolean aComplete, RelatedLink aLink, Map<String, Object> aCustom_fields, EconomicsEnum aEconomics, String aProjection, JSONArray aText_tracks, Images aImages) {
+        this(aId, aName, aReference_id, aDescription, aLong_description, aState, aFolder_id, aFolder_name, aTags, aGeo, aSchedule, aComplete, aLink, aCustom_fields, aEconomics, aProjection, aText_tracks, null, null);
     }
 
-    private Video(String aId, String aName, String aReference_id, String aDescription, String aLong_description, String aState, String aFolder_id, Collection<String> aTags, Geo aGeo, Schedule aSchedule, boolean aComplete, RelatedLink aLink, Map<String, Object> aCustom_fields, EconomicsEnum aEconomics, String aProjection, JSONArray aText_tracks, Images aImages, String aAccountId) {
+    private Video(String aId, String aName, String aReference_id, String aDescription, String aLong_description, String aState, String aFolder_id, String aFolder_name, Collection<String> aTags, Geo aGeo, Schedule aSchedule, boolean aComplete, RelatedLink aLink, Map<String, Object> aCustom_fields, EconomicsEnum aEconomics, String aProjection, JSONArray aText_tracks, Images aImages, String aAccountId) {
         id = aId;
         account_id = aAccountId;
         name = aName;
@@ -106,6 +107,7 @@ public class Video {
         long_description = aLong_description;
         state = aState;
         folder_id = aFolder_id;
+        folder_name = aFolder_name;
         tags = aTags;
         geo = aGeo;
         schedule = aSchedule;
@@ -132,6 +134,7 @@ public class Video {
         String locallong_description = null;
         String localstate = null;
         String localfolder_id = null;
+        String localfolder_name = null;
         Collection<String> localtags = null;
         Map<String, Object> localcustom_fields = null;
         Geo localgeo = null;
@@ -150,6 +153,7 @@ public class Video {
             locallong_description = (String) getNotNull(video, Constants.LONG_DESCRIPTION);
             localstate = (String) getNotNull(video, Constants.STATE);
             localfolder_id = (String) getNotNull(video, Constants.FOLDER_ID);
+            localfolder_name = (String) getNotNull(video, Constants.FOLDER_NAME);
             localprojection = (Projection) getNotNull(video, Constants.PROJECTION);
             localgeo = (Geo) getNotNull(video, Constants.GEO);
             localschedule = (Schedule) getNotNull(video, Constants.SCHEDULE);
@@ -180,6 +184,7 @@ public class Video {
             this.long_description = locallong_description;
             this.state = localstate;
             this.folder_id = localfolder_id;
+            this.folder_name = localfolder_name;
             this.tags = localtags;
             this.custom_fields = localcustom_fields;
             this.geo = localgeo;
@@ -193,7 +198,7 @@ public class Video {
     }
 
     public JSONObject toJSON() throws JSONException {
-        JSONObject json = ObjectSerializer.toJSON(this, new String[]{Constants.ID, Constants.ACCOUNT_ID, Constants.NAME, Constants.REFERENCE_ID, Constants.DESCRIPTION, Constants.LONG_DESCRIPTION, Constants.STATE, Constants.FOLDER_ID, Constants.TAGS, Constants.CUSTOM_FIELDS, Constants.GEO, Constants.SCHEDULE, Constants.LINK, Constants.ECONOMICS,Constants.PROJECTION, Constants.TEXT_TRACKS});
+        JSONObject json = ObjectSerializer.toJSON(this, new String[]{Constants.ID, Constants.ACCOUNT_ID, Constants.NAME, Constants.REFERENCE_ID, Constants.DESCRIPTION, Constants.LONG_DESCRIPTION, Constants.STATE, Constants.FOLDER_ID, Constants.FOLDER_NAME, Constants.TAGS, Constants.CUSTOM_FIELDS, Constants.GEO, Constants.SCHEDULE, Constants.LINK, Constants.ECONOMICS,Constants.PROJECTION, Constants.TEXT_TRACKS});
         return json;
     }
 
