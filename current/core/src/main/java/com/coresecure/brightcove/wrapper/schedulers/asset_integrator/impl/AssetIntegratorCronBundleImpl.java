@@ -34,6 +34,7 @@ package com.coresecure.brightcove.wrapper.schedulers.asset_integrator.impl;
 
 import com.coresecure.brightcove.wrapper.schedulers.asset_integrator.AssetIntegratorCronBundle;
 import com.coresecure.brightcove.wrapper.schedulers.asset_integrator.runnables.AssetPropertyIntegratorRunnable;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.*;
 import org.apache.sling.api.resource.ResourceResolverFactory;
 import org.apache.sling.commons.mime.MimeTypeService;
@@ -95,7 +96,22 @@ public class AssetIntegratorCronBundleImpl implements AssetIntegratorCronBundle 
     }
 
     public int getMaxThreadNum() {
-        return (Integer) getProperties().get("maxthreads");
+        Object maxthreadsObject = getProperties().get("maxthreads");
+        if(maxthreadsObject instanceof Integer) {
+            return (Integer)maxthreadsObject;
+        }
+        if(maxthreadsObject instanceof Long) {
+            Long maxthreads = (Long) getProperties().get("maxthreads");
+            return maxthreads.intValue();
+        }
+        if(maxthreadsObject instanceof String) {
+            String maxthreadsString = (String)maxthreadsObject;
+            if(StringUtils.isNumeric(maxthreadsString)) {
+                return Integer.parseInt(maxthreadsString);
+            }
+        }
+        //None of these things - return default
+        return 20;
     }
 
 
