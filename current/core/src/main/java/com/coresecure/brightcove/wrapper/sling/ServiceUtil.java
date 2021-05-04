@@ -730,7 +730,7 @@ public class ServiceUtil {
         }
     }
 
-    private void setImages(JSONObject objObject, Asset newAsset) {
+    private void setImages(JSONObject objObject, Asset newAsset, ModifiableValueMap map) {
         try {
             if (objObject.has(Constants.POSTER)) {
                 JSONObject images_poster_obj = objObject.getJSONObject(Constants.POSTER);
@@ -740,6 +740,7 @@ public class ServiceUtil {
                 InputStream ris = srcURL.openStream();
                 //Map<String,Object> rendition_map = new HashMap<String,Object>();
                 newAsset.addRendition(Constants.BRC_POSTER_PNG, ris, StandardImageHandler.PNG1_MIMETYPE);
+                map.put(Constants.BRC_POSTER_URL, src);
             } else {
                 newAsset.removeRendition(Constants.BRC_POSTER_PNG);
             }
@@ -752,6 +753,7 @@ public class ServiceUtil {
                 InputStream ris = new URL(src).openStream();
                 //Map<String,Object> rendition_map = new HashMap<String,Object>();
                 newAsset.addRendition(Constants.BRC_THUMBNAIL_PNG, ris, StandardImageHandler.PNG1_MIMETYPE);
+                map.put(Constants.BRC_THUMBNAIL_URL, src);
             } else {
                 newAsset.removeRendition(Constants.BRC_THUMBNAIL_PNG);
             }
@@ -919,7 +921,7 @@ public class ServiceUtil {
                         JSONObject objObject = (JSONObject) obj;
                         //CASE IMAGES
                         if (x.equals(Constants.IMAGES)) {
-                            setImages(objObject, newAsset);
+                            setImages(objObject, newAsset, map);
                         } //CASE SCHEDULE
                         else if (x.equals(Constants.SCHEDULE)) {
                             setSchedule(objObject, assetmap);
