@@ -197,7 +197,7 @@ public class VideoImportCallable implements Callable<String> {
     private String cleanPath(String confPath, String filename){
         //Read config value and do bucket folder logic if true
         if (serviceUtil.isBucketFolderStructureConfig() && filename.length() >= 9) {
-            return confPath.concat("/").concat(requestedServiceAccount + "/").concat(filename.substring(0,3) + "/").concat(filename.substring(0,6) + "/").concat(filename.substring(0,9) + "/").concat(filename);
+            return confPath.concat("/").concat(requestedServiceAccount + "/").concat(filename.substring(0,3) + "/").concat(filename.substring(0,6) + "/").concat(filename.substring(0,9) + "/").concat(filename.substring(0,filename.length()-4) + "/").concat(filename);
         } else if (confPath.endsWith("/")) {
             return confPath;
         } else {
