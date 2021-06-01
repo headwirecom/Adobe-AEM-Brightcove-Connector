@@ -1164,8 +1164,8 @@ public class ServiceUtil {
         String shortDescription = map.get(Constants.BRC_DESCRIPTION,"");
         String longDescription = map.get(Constants.BRC_LONG_DESCRIPTION,"");
         String projection = "equirectangular".equals(map.get(Constants.BRC_PROJECTION,""))? Constants.EQUIRECTANGULAR : "";
-        String folderId = map.get(Constants.BRC_FOLDER_ID, "");
-        String folderName = map.get(Constants.BRC_FOLDER_NAME, "");
+        String folderId = map.get(Constants.BRC_FOLDER_ID, "null");
+        String folderName = map.get(Constants.BRC_FOLDER_NAME, "null");
 
 
         Map<String, Object> custom_fields = new HashMap();
