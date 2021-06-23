@@ -941,7 +941,9 @@ public class ServiceUtil {
 
                 //AFTER SETTING ALL THE METADATA - SET THE LAST UPDATE TIME
                 //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-                map.put(Constants.BRC_LASTSYNC, com.coresecure.brightcove.wrapper.utils.JcrUtil.now2calendar());
+                Calendar timestamp = com.coresecure.brightcove.wrapper.utils.JcrUtil.now2calendar();
+                map.put(Constants.BRC_LASTSYNC, timestamp);
+                addTimestamp(metadataRes, timestamp, resourceResolver);
                 resourceResolver.commit();
                 LOGGER.trace(">>UPDATED METADATA FOR VIDEO : [{}]",map.get(Constants.BRC_ID));
 
@@ -950,6 +952,22 @@ public class ServiceUtil {
             LOGGER.error(e.getClass().getName(), e);
         }
 
+    }
+
+    private void addTimestamp(Resource metadataResource, Calendar timestamp, ResourceResolver resourceResolver) {
+        try {
+            Resource timestampResource = metadataResource.getChild("brc_timestamp");
+            if(timestampResource == null) {
+                Map<String, Object> properties = new HashMap<String, Object>();
+                properties.put(Constants.BRC_LASTSYNC, timestamp);
+                resourceResolver.create(metadataResource, "brc_timestamp", properties);
+            } else {
+                ModifiableValueMap properties = timestampResource.adaptTo(ModifiableValueMap.class);
+                properties.put(Constants.BRC_LASTSYNC, timestamp);
+            }
+        } catch (PersistenceException e) {
+            LOGGER.error("Exception handling timestamp node", e);
+        }
     }
 
     private JSONObject setOriginalRendition(Rendition original_rendition, Date brc_lastsync_time, Asset _asset, ServiceUtil serviceUtil, Video currentVideo) throws JSONException{
