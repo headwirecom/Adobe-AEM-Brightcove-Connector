@@ -904,6 +904,24 @@ function syncDB()
     });
 }
 
+function fullSyncDB()
+{
+    syncStart();
+    var url = window.location.origin + "/bin/brightcove/dataload";
+    data = {"account_id" : $("#selAccount").val(),"fullSync": true}
+    $.ajax({
+        type: 'GET',
+        url: url,
+        data: data,
+        async: true,
+        success: function (data)
+        {
+            syncEnd();
+            data = $.parseJSON(data);
+        }
+    });
+}
+
 
 function uploadPoster()
 {
@@ -1565,6 +1583,9 @@ function loadEnd()
     $("#syncdbutton").css("color", "#333333");
     $("#syncdbutton").html('SYNC DATABASE');
     $("#syncdbutton").prop('disabled', false);
+    $("#fullsyncdbutton").css("color", "#333333");
+    $("#fullsyncdbutton").html('FULL SYNC DATABASE');
+    $("#fullsyncdbutton").prop('disabled', false);
     if (!$.browser.msie) {
         $("#loading").slideUp("fast");
     } else {
@@ -1578,6 +1599,9 @@ function syncStart()
     $("#syncdbutton").css("color", "#6D8CAE");
     $("#syncdbutton").html('LOADING SYNC');
     $("#syncdbutton").prop('disabled', true);
+    $("#fullsyncdbutton").css("color", "#6D8CAE");
+    $("#fullsyncdbutton").html('LOADING FULL SYNC');
+    $("#fullsyncdbutton").prop('disabled', true);
     if (!$.browser.msie)
     {
         $("#loading").slideDown("fast");

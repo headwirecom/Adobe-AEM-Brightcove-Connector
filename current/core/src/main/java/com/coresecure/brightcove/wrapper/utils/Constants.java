@@ -183,5 +183,7 @@ public class Constants {
 
     public static final String PLAYLIST_TYPE = "type";
 
+    public static final String FULL_SYNC_PARAM = "fullSync";
+
 
 }

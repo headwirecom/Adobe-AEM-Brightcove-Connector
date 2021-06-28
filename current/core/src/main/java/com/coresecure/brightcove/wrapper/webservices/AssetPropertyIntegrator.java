@@ -103,6 +103,7 @@ public class AssetPropertyIntegrator extends SlingAllMethodsServlet {
             //MAIN TRY - CONFIGURATION GRAB SERVICE
             ConfigurationGrabber cg = ServiceUtil.getConfigurationGrabber();    //GETCONFIG SERVICE
             Set<String> services = cg.getAvailableServices();                            //BUILD SERVICES
+            boolean fullSync = getFullSync(req);
             for (String requestedAccount : services) {
                 final String requestedServiceAccount = requestedAccount;
                 //GET CURRENT CONFIGURATION
@@ -147,6 +148,7 @@ public class AssetPropertyIntegrator extends SlingAllMethodsServlet {
 
                     LOGGER.trace("<<< " + itemsArr.length() + " INCOMING VIDEOS");
 
+
                     //FOR EACH VIDEO IN THE ITEMS ARRAY
                     for (int i = 0; i < itemsArr.length(); i++) {
                         final JSONObject innerObj = itemsArr.getJSONObject(i);
@@ -155,8 +157,12 @@ public class AssetPropertyIntegrator extends SlingAllMethodsServlet {
                         String folderId = innerObj.getString(Constants.FOLDER_ID);
                         String folderName = folderMap.get(folderId) != null ? folderMap.get(folderId) : "null";
                         innerObj.put(Constants.FOLDER_NAME,folderName);
-
-                        Callable<String> callable = new VideoImportCallable(innerObj, confPath, requestedServiceAccount, resourceResolverFactory, mType, serviceUtil);
+                        Callable<String> callable;
+                        if (fullSync) {
+                            callable = new VideoImportCallable(innerObj, confPath, requestedServiceAccount, resourceResolverFactory, mType, serviceUtil, fullSync);
+                        } else {
+                            callable = new VideoImportCallable(innerObj, confPath, requestedServiceAccount, resourceResolverFactory, mType, serviceUtil);
+                        }
                         Future<String> future = executor.submit(callable);
                         //add Future to the list, we can get return value using Future
                         list.add(future);
@@ -185,6 +191,13 @@ public class AssetPropertyIntegrator extends SlingAllMethodsServlet {
     @Override
     protected void doGet(final SlingHttpServletRequest req, final SlingHttpServletResponse resp) throws ServletException, IOException {
         executeRequest(req, resp);
+    }
+
+    public static boolean getFullSync(SlingHttpServletRequest req)
+    {
+        String fullSyncParam = req.getParameter(Constants.FULL_SYNC_PARAM);
+        boolean fullSync = fullSyncParam != null && !fullSyncParam.isEmpty() ? Boolean.parseBoolean(fullSyncParam) : false;
+        return fullSync;
     }
 
 }

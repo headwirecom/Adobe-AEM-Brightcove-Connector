@@ -570,6 +570,7 @@ div.hLine {
 #newplstButton,
 #btn_MoveVideoToFolder,
 #syncdbutton,
+#fullsyncdbutton,
 #uploadtrackbutton,
 #text_track,
 #searchBut,
@@ -624,6 +625,12 @@ div.hLine {
 }
 
 #syncdbutton
+{
+  margin-right: 4px;
+  padding: 10px 20px;
+}
+
+#fullsyncdbutton
 {
   margin-right: 4px;
   padding: 10px 20px;

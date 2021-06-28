@@ -77,6 +77,7 @@ public class VideoImportCallable implements Callable<String> {
     private ServiceUtil serviceUtil;
     private ResourceResolverFactory resourceResolverFactory;
     private ResourceResolver resourceResolver = null;
+    private boolean fullSync = false;
     public VideoImportCallable(JSONObject innerObj, String confPath, String requestedServiceAccount, ResourceResolverFactory resourceResolverFactory, MimeTypeService mType, ServiceUtil serviceUtil){
         this.innerObj = innerObj;
         this.confPath = confPath;
@@ -84,6 +85,16 @@ public class VideoImportCallable implements Callable<String> {
         this.mType = mType;
         this.serviceUtil = serviceUtil;
         this.resourceResolverFactory = resourceResolverFactory;
+    }
+
+    public VideoImportCallable(JSONObject innerObj, String confPath, String requestedServiceAccount, ResourceResolverFactory resourceResolverFactory, MimeTypeService mType, ServiceUtil serviceUtil, boolean fullSync){
+        this.innerObj = innerObj;
+        this.confPath = confPath;
+        this.requestedServiceAccount = requestedServiceAccount;
+        this.mType = mType;
+        this.serviceUtil = serviceUtil;
+        this.resourceResolverFactory = resourceResolverFactory;
+        this.fullSync = fullSync;
     }
 
     private String getItemFromJson(JSONObject innerObj, String key) throws JSONException{
@@ -297,6 +308,9 @@ public class VideoImportCallable implements Callable<String> {
                 } else if (!local_folder_id.equals(remote_folder_id)) {
                     LOGGER.trace("MODIFICATION DETECTED");
                     LOGGER.trace("LOCAL FOLDER: {}, REMOTE FOLDER: {}",local_folder_id,remote_folder_id);
+                    serviceUtil.updateAsset(newAsset, innerObj, resourceResolver, requestedServiceAccount);
+                } else if (fullSync) {
+                    LOGGER.trace("FULL SYNC. UPDATING EVERY ASSET.");
                     serviceUtil.updateAsset(newAsset, innerObj, resourceResolver, requestedServiceAccount);
                 } else {
                     LOGGER.trace("No Changes to be Made = Asset is equivalent");
