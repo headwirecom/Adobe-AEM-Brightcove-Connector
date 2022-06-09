@@ -896,19 +896,22 @@ public class ServiceUtil {
 
                 map.put(TagConstants.PN_TAGS, tags.toArray());
 
-                for (String x : fields) {
+                for (String field : fields) {
 
                     //ADAPT NAME OF METADATA COMPING IN -> AEM PROPERTIES TO BE STORED
-                    if (!innerObj.has(x)) {
-                        LOGGER.trace("##HAS KEY BUT OBJECT IT LEADS TO IS NULL!");
-                        LOGGER.trace("## HAS OBJECT WITH KEY : " + x +" ? "+innerObj.has(x) + " isnull? : "+ (innerObj.get(x)==null));
+                    if (!innerObj.has(field) && field.equals(Constants.TEXT_TRACKS)) {
+                        String key = getKey(field);
+                        map.put(key, new String[0]);
+                        continue;
+                    } else if (!innerObj.has(field)) {
+                        LOGGER.error("Video '{}' does not have field '{}' and will not fully process.",innerObj.get(Constants.ID),field);
                         break;
                     }
 
 
-                    String key = getKey(x);
+                    String key = getKey(field);
 
-                    Object obj = innerObj.get(x);
+                    Object obj = innerObj.get(field);
 
                     LOGGER.trace("[X] {} {}", obj, key);
 
@@ -920,13 +923,13 @@ public class ServiceUtil {
 
                         JSONObject objObject = (JSONObject) obj;
                         //CASE IMAGES
-                        if (x.equals(Constants.IMAGES)) {
+                        if (field.equals(Constants.IMAGES)) {
                             setImages(objObject, newAsset, map);
                         } //CASE SCHEDULE
-                        else if (x.equals(Constants.SCHEDULE)) {
+                        else if (field.equals(Constants.SCHEDULE)) {
                             setSchedule(objObject, assetmap);
                         } //ELSE - LINK
-                        else if (x.equals(Constants.LINK)) {
+                        else if (field.equals(Constants.LINK)) {
                             setLink(objObject, map);
                         } else {
                             setObject(objObject, metadataRes, key);
@@ -935,7 +938,7 @@ public class ServiceUtil {
                     {
 
                         //THIS HANDLES REST OF NULL SET KEYS WHICH MAP TO PROPERTY VALUES
-                        setObject(obj, key, x, map, newAsset, assetmap);
+                        setObject(obj, key, field, map, newAsset, assetmap);
                     }
                 }
 
