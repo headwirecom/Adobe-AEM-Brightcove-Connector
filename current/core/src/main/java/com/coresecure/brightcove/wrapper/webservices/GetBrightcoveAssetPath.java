@@ -59,6 +59,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Component
@@ -69,7 +70,9 @@ import java.util.List;
 public class GetBrightcoveAssetPath extends SlingAllMethodsServlet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GetBrightcoveAssetPath.class);
-
+    String defaultAccount = "";
+    String cookieAccount = "";
+    String selectedAccount = "";
 
     @Override
     protected void doGet(final SlingHttpServletRequest request,
@@ -89,10 +92,19 @@ public class GetBrightcoveAssetPath extends SlingAllMethodsServlet {
 
         try {
 
-            String brcAccountId = ServiceUtil.getAccountFromCookie(request);
             ConfigurationGrabber cg = ServiceUtil.getConfigurationGrabber();
-            ConfigurationService brcService = cg.getConfigurationService(brcAccountId);
-            
+
+            Set<String>  services = cg.getAvailableServices(request);
+            ConfigurationService cs;
+            LOGGER.debug("services {}", services);
+
+            if (services.size() > 0) {
+                defaultAccount = (String) services.toArray()[0];                                        //Set first account as the default
+                cookieAccount = ServiceUtil.getAccountFromCookie(request);              //If old session holds account in cookie, set that as default
+                selectedAccount = (cookieAccount.trim().isEmpty()) ? defaultAccount : cookieAccount;    //Only if cookie acct is not empty - else default
+            }
+            ConfigurationService brcService = cg.getConfigurationService(selectedAccount) != null ? cg.getConfigurationService(selectedAccount) : cg.getConfigurationService(defaultAccount);
+
             String assetsPath = brcService.getAssetIntegrationPath();
             LOGGER.debug("Brightcove Videos Asset Path is {}", assetsPath);
 
