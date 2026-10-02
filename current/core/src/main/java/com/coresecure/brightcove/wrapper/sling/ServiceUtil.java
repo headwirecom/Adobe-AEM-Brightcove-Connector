@@ -957,19 +957,18 @@ public class ServiceUtil {
 
     }
 
-    private void addTimestamp(Resource metadataResource, Calendar timestamp, ResourceResolver resourceResolver) {
-        try {
-            Resource timestampResource = metadataResource.getChild("brc_timestamp");
-            if(timestampResource == null) {
-                Map<String, Object> properties = new HashMap<String, Object>();
-                properties.put(Constants.BRC_LASTSYNC, timestamp);
-                resourceResolver.create(metadataResource, "brc_timestamp", properties);
-            } else {
-                ModifiableValueMap properties = timestampResource.adaptTo(ModifiableValueMap.class);
-                properties.put(Constants.BRC_LASTSYNC, timestamp);
+    public void addTimestamp(Resource metadataResource, Calendar timestamp, ResourceResolver resourceResolver) throws PersistenceException {
+        Resource timestampResource = metadataResource.getChild("brc_timestamp");
+        if (timestampResource == null) {
+            Map<String, Object> properties = new HashMap<String, Object>();
+            properties.put(Constants.BRC_LASTSYNC, timestamp);
+            resourceResolver.create(metadataResource, "brc_timestamp", properties);
+        } else {
+            ModifiableValueMap properties = timestampResource.adaptTo(ModifiableValueMap.class);
+            if (properties == null) {
+                throw new PersistenceException("Cannot modify Brightcove timestamp at " + timestampResource.getPath());
             }
-        } catch (PersistenceException e) {
-            LOGGER.error("Exception handling timestamp node", e);
+            properties.put(Constants.BRC_LASTSYNC, timestamp);
         }
     }
 

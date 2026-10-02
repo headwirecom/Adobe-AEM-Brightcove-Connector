@@ -39,8 +39,9 @@ import com.coresecure.brightcove.wrapper.utils.HttpServices;
 import com.coresecure.brightcove.wrapper.utils.ImageUtil;
 import com.day.cq.dam.api.Asset;
 import com.day.cq.dam.api.AssetManager;
-import com.day.cq.reporting.helpers.Const;
 import org.apache.sling.api.resource.Resource;
+import org.apache.sling.api.resource.ModifiableValueMap;
+import org.apache.sling.api.resource.PersistenceException;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ResourceResolverFactory;
 import org.apache.sling.api.resource.ValueMap;
@@ -229,6 +230,24 @@ public class VideoImportCallable implements Callable<String> {
         }
         return null;
     }
+
+    private void updateAssetState(Asset asset, String state) throws PersistenceException {
+        Resource assetResource = asset.adaptTo(Resource.class);
+        Resource metadataResource = assetResource != null ? assetResource.getChild(Constants.ASSET_METADATA_PATH) : null;
+        ModifiableValueMap metadata = metadataResource != null ? metadataResource.adaptTo(ModifiableValueMap.class) : null;
+        if (metadata == null) {
+            LOGGER.warn("Cannot update Brightcove state: metadata unavailable for {}", asset.getPath());
+            return;
+        }
+        if (!state.equals(metadata.get(Constants.BRC_STATE, String.class))) {
+            metadata.put(Constants.BRC_STATE, state);
+            serviceUtil.addTimestamp(metadataResource,
+                    com.coresecure.brightcove.wrapper.utils.JcrUtil.now2calendar(), resourceResolver);
+            resourceResolver.commit();
+            LOGGER.debug("Updated Brightcove state to {} for {}", state, asset.getPath());
+        }
+    }
+
     public String call(){
         // Get the Service resource resolver
         try {
@@ -239,32 +258,19 @@ public class VideoImportCallable implements Callable<String> {
             //FOR EACH VIDEO COMING BACK FROM THE QUERY
 
 
-            //CHECK IF VIDEO'S STATE IS SET TO ACTIVE - CONDITION ONE
-            Boolean active = innerObj.has(Constants.STATE) && innerObj.get(Constants.STATE) != null && "ACTIVE".equals(innerObj.getString(Constants.STATE)) &&  innerObj.has(Constants.ID) && innerObj.get(Constants.ID) != null;
-
-            //CONDITIONN TWO - MUST HAVE AN ID
             String id = getItemFromJson(innerObj,Constants.ID);
+            String state = getItemFromJson(innerObj,Constants.STATE);
+            boolean active = "ACTIVE".equals(state);
+            if (innerObj.isNull(Constants.ID) || id.isEmpty() || (!active && !"INACTIVE".equals(state))) {
+                LOGGER.warn("VIDEO INITIALIZATION FAILED - INVALID STATE / NO ID - skipping: {}", innerObj.toString(1));
+                return Thread.currentThread().getName();
+            }
 
 
             LOGGER.trace(">>>>START>>>>> {} >> {}", id ,active);
 
-            //TODO: CHECK IF VIDEO COMING INTO DAM (1) IS ACTIVE (2) HAS AN ID + SRC IMAGE??
-            if (!active) {
-                LOGGER.warn("VIDEO INITIALIZATION FAILED - NOT ACTIVE / NO ID - skipping: " + innerObj.toString(1));
-                if (resourceResolver != null) {
-                    resourceResolver.close();
-                }
-                return  Thread.currentThread().getName();
-            }
-
-            String name = innerObj.getString(Constants.NAME);
             String brightcove_filename = id + ".mp4"; //BRIGHTCOVE FILE NAME IS ID + . MP4 <-
-            String original_filename = cleanFilename(innerObj);
-
-            LOGGER.trace("SYNCING VIDEO>>[" + name + "\tSTATE:ACTIVE\tTO BE:" + original_filename + "]");
-
-            //INITIALIZING ASSET SEARCH // INITIALIZATION
-            Asset newAsset = null;
+            String original_filename = innerObj.isNull(Constants.ORIGINAL_FILENAME) ? brightcove_filename : cleanFilename(innerObj);
 
             //TODO: PRINTING DEBUGGER (ENABLE TO DEBUG)
 
@@ -277,8 +283,19 @@ public class VideoImportCallable implements Callable<String> {
             LOGGER.trace(">>PATH: " + localpath);
 
 
+            Asset newAsset = getAsset(oldpath,localpath);
+            // Inactive videos only update the state of existing assets; they never create an asset.
+            if (!active) {
+                if (newAsset != null) {
+                    updateAssetState(newAsset, state);
+                }
+                return Thread.currentThread().getName();
+            }
+
+            String name = innerObj.getString(Constants.NAME);
+            LOGGER.trace("SYNCING VIDEO>>[" + name + "\tSTATE:ACTIVE\tTO BE:" + original_filename + "]");
+
             //TRY TO GET THIS ASSET IN THE CONFIGURED BC NODE PATH - IF IT IS NULL - IT MUST BE CREATED
-            newAsset = getAsset(oldpath,localpath);
             if (newAsset == null) {
                 newAsset = createAsset(localpath,id,brightcove_filename);
                 if (newAsset != null) serviceUtil.updateAsset(newAsset, innerObj, resourceResolver, requestedServiceAccount);
@@ -286,14 +303,20 @@ public class VideoImportCallable implements Callable<String> {
                 //START CASE - ASSET HAS BEEN FOUND LOCALLY - CAN BE UPDATED
                 LOGGER.trace("ASSET FOUND - UPDATING");
 
+                Resource metadataResource = newAsset.adaptTo(Resource.class).getChild("jcr:content/metadata");
+                ValueMap metadataProperties = metadataResource.adaptTo(ValueMap.class);
+                // Sync all metadata before the timestamp launches the page workflow on reactivation.
+                if ("INACTIVE".equals(metadataProperties.get(Constants.BRC_STATE, String.class))) {
+                    LOGGER.trace("VIDEO REACTIVATED - SYNCING ALL METADATA");
+                    serviceUtil.updateAsset(newAsset, innerObj, resourceResolver, requestedServiceAccount);
+                    return Thread.currentThread().getName();
+                }
+
                 //DATE COMPARISON TO MAKE SURE IT MUST BE UPDATED
                 Date local_mod_date = new Date(newAsset.getLastModified());
-
                 SimpleDateFormat sdf = new SimpleDateFormat(ISO_8601_24H_FULL_FORMAT);
                 Date remote_date = sdf.parse(innerObj.getString(Constants.UPDATED_AT));
 
-                Resource metadataResource = newAsset.adaptTo(Resource.class).getChild("jcr:content/metadata");
-                ValueMap metadataProperties = metadataResource.adaptTo(ValueMap.class);
                 String local_folder_id = metadataProperties.get(Constants.BRC_FOLDER_ID,"");
                 String remote_folder_id = innerObj.getString(Constants.FOLDER_ID);
 
@@ -313,6 +336,7 @@ public class VideoImportCallable implements Callable<String> {
                     LOGGER.trace("FULL SYNC. UPDATING EVERY ASSET.");
                     serviceUtil.updateAsset(newAsset, innerObj, resourceResolver, requestedServiceAccount);
                 } else {
+                    updateAssetState(newAsset, state);
                     LOGGER.trace("No Changes to be Made = Asset is equivalent");
 
                 }
